@@ -1,0 +1,10 @@
+
+
+in @src\app\page.tsx there is handling of grammar correction tool dont change for any other tool. now problem1 when i input a        
+  file it says it gives analyzing message and below it gives another message giving original document( whose html i am rendering) and on  its right side i am showing corrected html . 
+  even when  complete output is given the analyzing message still remains and there is nothing to know that         
+   corrcted response is completed give an option to paste the corrected response. second problem         
+  the ui of grammar correction @src/components/GrammarCorrectionView.tsx looks very lame (one side       
+  original and other side correct with just a sinle line). use new libraries and if possible compare the original and            
+  corrected to show the changes ,, so that user knows where changes. use the space and width of the grammarcorrectionview to show the       
+   responses and inputs.
