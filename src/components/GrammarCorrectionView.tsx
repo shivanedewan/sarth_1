@@ -17,14 +17,14 @@ const GrammarCorrectionView: React.FC<GrammarCorrectionViewProps> = ({ jobId, or
   useEffect(() => {
     const pollStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/grammar/job_status?job_id=${jobId}`);
+        const response = await fetch(`http://172.21.60.92:8010/job-status?jobid=${jobId}`);
         const data = await response.json();
         setStatus(data.status);
 
         if (data.status === 'grammar_completed') {
-          const streamResponse = await fetch(`http://localhost:8000/grammar/stream/${jobId}`);
+          const streamResponse = await fetch(`http://172.21.60.92:8010/job-output/${jobId}`);
           const streamData = await streamResponse.json();
-          setCorrectedHtml(streamData.html_corrected);
+          setCorrectedHtml(streamData.html);
           setIsStreamComplete(true);
         } else if (data.status !== 'processing') {
           // Handle other statuses like failed or cancelled
@@ -90,14 +90,6 @@ const GrammarCorrectionView: React.FC<GrammarCorrectionViewProps> = ({ jobId, or
 };
 
 export default GrammarCorrectionView;
-
-// interface HtmlRendererProps {
-//   html: string;
-// }
-
-// const HtmlRenderer: React.FC<HtmlRendererProps> = ({ html }) => {
-//   return <div dangerouslySetInnerHTML={{ __html: html }} />;
-// };
 
 
 // export default GrammarCorrectionView;

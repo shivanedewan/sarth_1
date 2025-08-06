@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+// Import necessary hooks and components from React and other libraries
+import { useState, useEffect, useRef } from 'react';
 import { Menu } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import Sidebar from '@/components/Sidebar';
 import ChatMessage from '@/components/ChatMessage';
 import GrammarCorrectionView from '@/components/GrammarCorrectionView';
 import { useConversations } from '@/hooks/useConversations';
-import { useEffect, useRef } from 'react';
 
+// The main component for the home page
 export default function Home() {
+  // Define the list of available tools
   const tools = [
     { id: 1, name: 'Grammar Correction', icon: '📝' },
     { id: 2, name: 'Language Translation', icon: '💻' },
@@ -17,6 +19,8 @@ export default function Home() {
     { id: 4, name: 'Paraphraser', icon: '🔄' },
     { id: 5, name: 'Summarizer', icon: '📋' },
   ];
+
+  // State management for UI elements and application logic
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -30,6 +34,7 @@ export default function Home() {
     icon: '📋',
   });
 
+  // Custom hook to manage conversations
   const {
     conversations,
     currentConversationId,
@@ -43,13 +48,29 @@ export default function Home() {
     overwriteLastMessage,
   } = useConversations();
 
+  /****************************************************************************
+   * START: Grammar Correction Tool's Differentiated Logic
+   *
+   * The following section highlights how the 'Grammar Correction' tool is
+   * handled differently from the other tools.
+   ****************************************************************************/
+
+  /**
+   * This function determines the API endpoint based on the selected tool.
+   * For the 'Grammar Correction' tool, it uses a specific URL, while all
+   * other tools use a default API URL.
+   */
   const getApiUrl = (toolName: string) => {
     if (toolName === 'Grammar Correction') {
-      return process.env.NEXT_PUBLIC_GRAMMAR_API_URL;
+      return process.env.NEXT_PUBLIC_GRAMMAR_API_URL; // Specific URL for Grammar Correction
     }
-    return process.env.NEXT_PUBLIC_API_URL;
+    return process.env.NEXT_PUBLIC_API_URL; // Default URL for other tools
   };
 
+  /**
+   * This function submits the user's task to the backend. The handling of the
+   * response is different for the 'Grammar Correction' tool.
+   */
   const submitTask = async (convId: string, query: string, file?: File) => {
     if (!selectedTool) {
       setIsStreaming(false);
@@ -67,6 +88,7 @@ export default function Home() {
       formData.append('file', file);
     }
 
+    // Get the appropriate API URL for the selected tool.
     const apiUrl = getApiUrl(selectedTool.name);
 
     try {
@@ -80,8 +102,18 @@ export default function Home() {
         const jobId = result.jobid;
         console.log(result);
         console.log(result.jobid);
-        console.log(result.html)
+        
+
+        /**
+         * If the selected tool is 'Grammar Correction', the application
+         * immediately receives the original HTML content and a job ID.
+         * It then updates the last message in the conversation with a
+         * special 'grammar' type, including the job ID and the original HTML.
+         * It does not proceed to poll for job status or stream a response
+         * in the same way as other tools.
+         */
         if (selectedTool.name === 'Grammar Correction') {
+            console.log(result.html);
           overwriteLastMessage(convId, {
             type: 'grammar',
             jobId: result.jobid,
@@ -89,6 +121,7 @@ export default function Home() {
           });
           setIsStreaming(false);
         } else {
+          // For all other tools, the application polls for job status.
           const pollJobStatus = setInterval(async () => {
             try {
               const statusResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/job-status?jobid=${jobId}`);
@@ -122,7 +155,12 @@ export default function Home() {
       setIsStreaming(false);
     }
   };
+  
+  /****************************************************************************
+   * END: Grammar Correction Tool's Differentiated Logic
+   ****************************************************************************/
 
+  // Function to stream the response from the server
   const streamResponse = async (convId: string, jobId: string) => {
     streamControllerRef.current = new AbortController();
     const { signal } = streamControllerRef.current;
@@ -178,6 +216,7 @@ export default function Home() {
     }
   };
 
+  // Handles the user's request by creating a conversation and submitting the task
   const handleUserRequest = async (message: string, file?: File) => {
     setIsStreaming(true);
     let convId = currentConversationId;
@@ -204,19 +243,23 @@ export default function Home() {
     submitTask(convId, message, file);
   };
 
+  // Handler for sending a text message
   const handleSendMessage = (message: string) => {
     handleUserRequest(message);
   };
 
+  // Handler for uploading a file
   const handleFileUpload = (file: File, message?: string) => {
     handleUserRequest(message || '', file);
   };
 
+  // Handler for starting a new chat
   const handleNewChat = () => {
     clearCurrentConversation();
     setIsSidebarOpen(false);
   };
 
+  // Handler for selecting a tool
   const handleToolSelect = (tool: { id: number; name: string; icon: string }) => {
     if (currentConversationId) {
       clearCurrentConversation();
@@ -224,10 +267,12 @@ export default function Home() {
     setSelectedTool(tool);
   };
 
+  // Toggles the visibility of the sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // JSX for rendering the component
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
@@ -258,7 +303,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setIsToolsDropdownOpen(!isToolsDropdownOpen)}
                   className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-md hover:bg-gray-100"
                 >

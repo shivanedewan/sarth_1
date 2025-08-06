@@ -20,7 +20,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
 
   return (
     <div className={`py-6 ${isUser ? 'bg-white' : 'bg-gray-50'}`}>
-      <div className="max-w-4xl mx-auto px-4">
+      <div className={`max-w-6xl px-4 ${isUser ? '' : ''}`}>
         <div className="flex gap-4">
           {/* Avatar */}
           <div
@@ -68,7 +68,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         </div>
       </div>
       {isGrammarCorrection && (
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-full mx-auto px-4">
             <GrammarCorrectionView
                 jobId={message.content.jobId}
                 originalHtml={message.content.originalHtml}
