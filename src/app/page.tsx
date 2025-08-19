@@ -82,10 +82,14 @@ export default function Home() {
         console.log(result.jobid);
         console.log(result.html)
         if (selectedTool.name === 'Grammar Correction') {
+          const isHtmlInput = !!result.html; 
+          const originalContent = isHtmlInput ? result.html : result.query;
+
           overwriteLastMessage(convId, {
             type: 'grammar',
             jobId: result.jobid,
-            originalHtml: result.html,
+            originalContent: originalContent,
+            isHtml: isHtmlInput
           });
           setIsStreaming(false);
         } else {

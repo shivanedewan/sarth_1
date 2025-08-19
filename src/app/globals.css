@@ -28,3 +28,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+del {
+  text-decoration: line-through;
+  background-color: #fecaca; /* Red-200 */
+}
+
+ins {
+  text-decoration: none;
+  background-color: #bbf7d0; /* Green-200 */
+}

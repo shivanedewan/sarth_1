@@ -71,8 +71,9 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         <div className="max-w-full mx-auto px-4">
             <GrammarCorrectionView
                 jobId={message.content.jobId}
-                originalHtml={message.content.originalHtml}
-              />
+                originalContent={message.content.originalContent}
+                isHtml={message.content.isHtml}
+            />
         </div>
       )}
     </div>
